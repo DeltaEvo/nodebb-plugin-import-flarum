@@ -96,10 +96,18 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
             if(download && row._picture) {
               Exporter.log("Downloading " + row._picture);
               request({url: row._picture, encoding:null}, function(error , response, body) {
+                if(error) {
+                  Exporter.error(error);
+                  i--;
+                  return;
+                }
+                Exporter.log("Downloaded " + row._picture);
+                delete row._picture;
                 row._pictureBlob = body;
                 i--;
+                if(i == 0)
+                  callback(null, map);
               });
-              delete row._picture;
             } else
               i--;
             if(i == 0)
