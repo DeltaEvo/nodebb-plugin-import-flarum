@@ -19,8 +19,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 			password: config.dbpass || config.pass || config.password || '',
 			port: config.dbport || config.port || 3306,
 			database: config.dbname || config.name || config.database || 'flarum',
-      url: config.custom.url || '',
-      download: config.custom.download || false
+      url: config.custom.url || ''
 		};
 
 		Exporter.config(_config);
@@ -42,7 +41,6 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 		var err;
 		var prefix = Exporter.config('prefix');
     var url = Exporter.config('url');
-    var download = Exporter.config('download');
 		var query = 'SELECT '
 				+ prefix + 'users.id as _uid, '
 				+ prefix + 'users.username as _username, '
@@ -92,27 +90,9 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
               row._groups = row._groups.split(',');
             }
 						map[row._uid] = row;
-
-            if(download && row._picture) {
-              Exporter.log("Downloading " + row._picture);
-              request({url: row._picture, encoding:null}, function(error , response, body) {
-                if(error) {
-                  Exporter.error(error);
-                  i--;
-                  return;
-                }
-                Exporter.log("Downloaded " + row._picture);
-                delete row._picture;
-                row._pictureBlob = body;
-                i--;
-                if(i == 0)
-                  callback(null, map);
-              });
-            } else
-              i--;
-            if(i == 0)
-              callback(null, map);
 					});
+
+          callback(null, map);
 				});
 	};
 

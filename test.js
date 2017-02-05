@@ -6,7 +6,7 @@ require('./index').testrun({
     dbname: 'flarum',
     dbuser: process.env.user || '',
     dbpass: process.env.pass || '',
-    custom: { url: '' , download: true }
+    custom: { url: '' }
 
 }, function(err, results) {
     results.forEach(function(result, i) {
