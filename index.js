@@ -2,6 +2,7 @@
 var async = require('async');
 var mysql = require('mysql');
 var _ = require('underscore');
+var request = require('request');
 var noop = function(){};
 var logPrefix = '[nodebb-plugin-import-ubb]';
 
@@ -18,7 +19,8 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 			password: config.dbpass || config.pass || config.password || '',
 			port: config.dbport || config.port || 3306,
 			database: config.dbname || config.name || config.database || 'flarum',
-      url: config.custom.url || ''
+      url: config.custom.url || '',
+      download: config.custom.download || false
 		};
 
 		Exporter.config(_config);
@@ -40,6 +42,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 		var err;
 		var prefix = Exporter.config('prefix');
     var url = Exporter.config('url');
+    var download = Exporter.config('download');
 		var query = 'SELECT '
 				+ prefix + 'users.id as _uid, '
 				+ prefix + 'users.username as _username, '
@@ -70,6 +73,8 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 
 					//normalize here
 					var map = {};
+          var i = rows.length;
+
 					rows.forEach(function(row) {
 						// from unix timestamp (s) to JS timestamp (ms)
 						//row._joindate = ((row._joindate || 0) * 1000) || startms;
@@ -87,9 +92,19 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
               row._groups = row._groups.split(',');
             }
 						map[row._uid] = row;
-					});
 
-					callback(null, map);
+            if(download && row._picture) {
+              Exporter.log("Downloading " + row._picture);
+              request({url: row._picture, encoding:null}, function(error , response, body) {
+                row._pictureBlob = body;
+                i--;
+              });
+              delete row._picture;
+            } else
+              i--;
+            if(i == 0)
+              callback(null, map);
+					});
 				});
 	};
 
@@ -285,10 +300,10 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 				});
 	};
 
-	Exporter.getFavourites = function(callback) {
-		return Exporter.getPaginatedFavourites(0, -1, callback);
+	Exporter.getVotes = function(callback) {
+		return Exporter.getPaginatedVotes(0, -1, callback);
 	};
-	Exporter.getPaginatedFavourites = function(start, limit, callback) {
+	Exporter.getPaginatedVotes = function(start, limit, callback) {
 		callback = !_.isFunction(callback) ? noop : callback;
 
 		var err;
@@ -318,8 +333,10 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 					//normalize here
 					var map = {};
 					rows.forEach(function(row, i) {
-            row._fid = i;
-						map[row._fid] = row;
+            row._vid = i;
+            row._action = 1;
+
+						map[row._vid] = row;
 					});
 
 					callback(null, map);
@@ -355,7 +372,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 				Exporter.getPosts(next);
 			},
       function(next) {
-        Exporter.getFavourites(next);
+        Exporter.getVotes(next);
       },
 			function(next) {
 				Exporter.teardown(next);
