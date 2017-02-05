@@ -1,0 +1,26 @@
+{
+  "name": "nodebb-plugin-import-flarum",
+  "version": "1.0.0",
+  "description": "A flarum exporter for nodebb-plugin-import",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeltaEvo/nodebb-plugin-import-flarum.git"
+  },
+  "keywords": [
+    "nodebb-plugin-import",
+    "exporter",
+    "flarum"
+  ],
+  "author": "DeltaEvo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DeltaEvo/nodebb-plugin-import-flarum/issues"
+  },
+  "homepage": "https://github.com/DeltaEvo/nodebb-plugin-import-flarum#readme"
+}
