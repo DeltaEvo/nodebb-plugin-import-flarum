@@ -33,6 +33,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 	Exporter.getUsers = function(callback) {
 		return Exporter.getPaginatedUsers(0, -1, callback);
 	};
+
 	Exporter.getPaginatedUsers = function(start, limit, callback) {
 		callback = !_.isFunction(callback) ? noop : callback;
 
@@ -174,6 +175,10 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 				});
 	};
 
+  function removeMarkup(i) {
+    return i.replace(/<([^<|>]*)>/g , '').replace(/(@\w+)#(\d+)/g , '$1');
+  }
+
 	Exporter.getTopics = function(callback) {
 		return Exporter.getPaginatedTopics(0, -1, callback);
 	};
@@ -219,11 +224,10 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 						row._title = row._title ? row._title[0].toUpperCase() + row._title.substr(1) : 'Untitled';
             row._edited = row._edited ? Date.parse(row._edited) : null;
             row._timestamp = row._timestamp ? Date.parse(row._timestamp) : null;
-            row._content = row._content ? row._content.replace(/<([^<|>]*)>/g , '') : null;
+            row._content = row._content ? removeMarkup(row._content) : null;
 
 						map[row._tid] = row;
 					});
-          console.log(map);
 
 					callback(null, map);
 				});
@@ -250,7 +254,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 				+ 'FROM ' + prefix + 'posts '
 					// this post cannot be a its topic's main post, it MUST be a reply-post
 					// see https://github.com/akhoury/nodebb-plugin-import#important-note-on-topics-and-posts
-				+ 'WHERE number > 1 '
+				+ 'WHERE number > 1 AND type="comment" '
 				+ (start >= 0 && limit >= 0 ? 'LIMIT ' + start + ',' + limit : '');
 
 
@@ -272,7 +276,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 					rows.forEach(function(row) {
             row._timestamp = row._timestamp ? Date.parse(row._timestamp) : null;
 						row._edited = row._edited ? Date.parse(row._edited) : null;
-            row._content = row._content ? row._content.replace(/<([^<|>]*)>/g , '') : null;
+            row._content = row._content ? removeMarkup(row._content) : null;
 
 						map[row._pid] = row;
 					});
