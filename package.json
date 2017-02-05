@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-import-flarum",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A flarum exporter for nodebb-plugin-import",
   "main": "index.js",
   "dependencies": {},
