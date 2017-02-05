@@ -142,7 +142,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 				+ 'name as _name, '
         + 'slug as _slug, '
         + 'description as _description, '
-        + 'color as _color, '
+        + 'color as _bgColor, '
         + 'position as _order, '
         + 'parent_id as _parentCid '
 				+ 'FROM ' + prefix + 'tags '
@@ -219,9 +219,11 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 						row._title = row._title ? row._title[0].toUpperCase() + row._title.substr(1) : 'Untitled';
             row._edited = row._edited ? Date.parse(row._edited) : null;
             row._timestamp = row._timestamp ? Date.parse(row._timestamp) : null;
+            row._content = row._content ? row._content.replace(/<([^<|>]*)>/g , '') : null;
 
 						map[row._tid] = row;
 					});
+          console.log(map);
 
 					callback(null, map);
 				});
@@ -270,6 +272,7 @@ var logPrefix = '[nodebb-plugin-import-ubb]';
 					rows.forEach(function(row) {
             row._timestamp = row._timestamp ? Date.parse(row._timestamp) : null;
 						row._edited = row._edited ? Date.parse(row._edited) : null;
+            row._content = row._content ? row._content.replace(/<([^<|>]*)>/g , '') : null;
 
 						map[row._pid] = row;
 					});

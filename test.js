@@ -4,8 +4,8 @@ require('./index').testrun({
     dbhost: 'localhost',
     dbport: 3306,
     dbname: 'flarum',
-    dbuser: '',
-    dbpass: '',
+    dbuser: process.env.user || '',
+    dbpass: process.env.pass || '',
     custom: { url: '' }
 
 }, function(err, results) {
